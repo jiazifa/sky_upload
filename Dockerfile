@@ -1,25 +1,33 @@
 FROM python
 
-RUN mkdir -p /usr/src/app && mkdir -p /var/log/gunicorn
+ARG pypi_host=pypi.douban.com
+ARG pypi_mirror=http://pypi.douban.com/simple
 
 VOLUME [ "/disk"]
 
-WORKDIR /usr/src/app
+ENV LC_ALL C.UTF-8
 
-COPY requirements.txt /usr/src/app/requirements.txt
+ENV LANG C.UTF-8
 
-COPY ./conf/pip.conf /etc/pip.conf
-
-RUN pip install --no-cache-dir -r /usr/src/app/requirements.txt
-
-COPY . /usr/src/app
+ENV PIP_INDEX_URL $pypi_mirror
 
 ENV FLASK_ENV production
 
 ENV UPLOAD_DEST /disk
 
-ENV PORT 8000
+WORKDIR /app
 
-EXPOSE 8000
+COPY requirements.txt requirements.txt
 
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:8000", "run:application"]
+RUN pip install --no-cache-dir -r requirements.txt --trusted-host ${pypi_host}
+
+COPY app app
+
+COPY start_server.sh start_server.sh
+
+COPY runner.py runner.py
+
+RUN chmod a+x start_server.sh
+
+EXPOSE 5000
+ENTRYPOINT [ "./start_server.sh" ]

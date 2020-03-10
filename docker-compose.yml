@@ -1,0 +1,12 @@
+version: "3"
+
+services: 
+    web:
+        restart: always
+        build: .
+        ports: 
+            - "8002:5000"
+        volumes:
+            - disk:/app/disk
+volumes: 
+    disk:
