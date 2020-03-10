@@ -4,10 +4,9 @@ from app.config import Config
 from app import create_app
 
 main_app = create_app()
-# application = SharedDataMiddleware(
-#     main_app, {"/shared": os.path.join(Config().UPLOAD_FOLDER)}, cache=False,
-# )
-application = main_app
+application = SharedDataMiddleware(
+    main_app, {"/shared": os.path.join(Config().UPLOAD_FOLDER)}, cache=False,
+)
 
 if __name__ == "__main__":
     main_app.wsgi_app = SharedDataMiddleware(
