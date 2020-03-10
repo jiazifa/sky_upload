@@ -5,22 +5,21 @@ import os
 from uuid import uuid4
 from flask import Flask, request, Blueprint, jsonify, current_app
 from werkzeug import secure_filename
-from werkzeug.datastructures import FileStorage
+from werkzeug.datastructures import FileStorage, MultiDict
 
 api = Blueprint("/", __name__)
 
 
 def upload():
     files: List[FileStorage] = []
-    tf: Optional[FileStorage] = request.files["file"]
-    tfs: Optional[List[FileStorage]] = request.files.getlist("files")
-    payload: List[Dict[str, str]] = []
-    if tf:
-        # 单个文件
-        files.append(tf)
-    if tfs:
+    file_dict: MultiDict = request.files
+    if "files" in file_dict:
+        tfs: Optional[List[FileStorage]] = file_dict.getlist("files")
         files.extend(tfs)
-
+    elif "file" in file_dict:
+        tf: Optional[FileStorage] = file_dict.get("file", None)
+        files.append(tf)
+    payload: List[Dict[str, str]] = []
     dest: str = current_app.config["UPLOAD_FOLDER"]
     if not os.path.exists(dest):
         os.mkdir(dest)
