@@ -32,8 +32,9 @@ def upload():
         target_file = ".".join([identifier, extension])
         file.save(os.path.join(dest, target_file))
         url = "/".join(["/shared", target_file])
+        full_url = request.scheme + "://" + request.host + url
         payload.append(
-            {"source": filename, "target": target_file, "target_url": url,}
+            {"source": filename, "target": target_file, "target_url": url, "full_url": full_url}
         )
     return jsonify(payload)
 
