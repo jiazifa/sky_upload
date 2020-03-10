@@ -5,18 +5,18 @@ import os
 from uuid import uuid4
 from flask import Flask, request, Blueprint, jsonify, current_app
 from werkzeug import secure_filename
-from werkzeug.datastructures import FileStorage, MultiDict
+from werkzeug.datastructures import FileStorage, ImmutableMultiDict
 
 api = Blueprint("/", __name__)
 
 
 def upload():
     files: List[FileStorage] = []
-    file_dict: MultiDict = request.files
-    if "files" in file_dict:
+    file_dict: ImmutableMultiDict = request.files
+    if  file_dict.getlist("files"):
         tfs: Optional[List[FileStorage]] = file_dict.getlist("files")
         files.extend(tfs)
-    elif "file" in file_dict:
+    elif file_dict.get("file"):
         tf: Optional[FileStorage] = file_dict.get("file", None)
         files.append(tf)
     payload: List[Dict[str, str]] = []
